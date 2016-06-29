@@ -89,32 +89,36 @@ function SimpleChart(data) {
         if (modifiers.minValue < 0) {
             translate.y = -modifiers.minValue / (modifiers.maxValue - modifiers.minValue) * canvas.height;
             translate.y *= -1;
-            translate.y -= 0.5
+
+            if ((Number(translate.y) === translate.y) && (translate.y % 1 === 0)) {
+                translate.y -= 0.5
+            }
         }
 
         canvas.context.translate(translate.x, translate.y);
+        {
+            canvas.context.beginPath();
+            canvas.context.moveTo(10, canvas.object.height - 15.5);
+            canvas.context.lineTo(canvas.object.width - 10, canvas.object.height - 15.5);
+            canvas.context.stroke();
 
-        canvas.context.beginPath();
-        canvas.context.moveTo(10, canvas.object.height - 15.5);
-        canvas.context.lineTo(canvas.object.width - 10, canvas.object.height - 15.5);
-        canvas.context.stroke();
-
-        canvas.context.translate(0, -0.5);
-        canvas.context.beginPath();
-        canvas.context.moveTo(canvas.object.width - 12, canvas.object.height - 12);
-        canvas.context.lineTo(canvas.object.width - 12, canvas.object.height - 18);
-        canvas.context.lineTo(canvas.object.width - 5, canvas.object.height - 15);
-        canvas.context.fill();
-
+            canvas.context.translate(0, -0.5);
+            canvas.context.beginPath();
+            canvas.context.moveTo(canvas.object.width - 12, canvas.object.height - 12);
+            canvas.context.lineTo(canvas.object.width - 12, canvas.object.height - 18);
+            canvas.context.lineTo(canvas.object.width - 5, canvas.object.height - 15);
+            canvas.context.fill();
+        }
         canvas.context.translate(-translate.x, -translate.y);
 
         canvas.context.translate(0.5, 0.5);
-        canvas.context.beginPath();
-        canvas.context.moveTo(12, 12);
-        canvas.context.lineTo(18, 12);
-        canvas.context.lineTo(15, 5);
-        canvas.context.fill();
-
+        {
+            canvas.context.beginPath();
+            canvas.context.moveTo(12, 12);
+            canvas.context.lineTo(18, 12);
+            canvas.context.lineTo(15, 5);
+            canvas.context.fill();
+        }
         canvas.context.translate(-0.5, -0.5);
     }
 
@@ -179,14 +183,14 @@ function SimpleChart(data) {
     window.onload = function() {
         canvas.object = document.getElementById(data.id);
         canvas.context = canvas.object.getContext('2d');
-        canvas.height = canvas.object.height - 40;
-        canvas.width = canvas.object.width - 40;
+        canvas.height = canvas.object.height - 35;
+        canvas.width = canvas.object.width - 35;
 
         modifiers = getModifiers(data.points);
 
         drawScene(canvas, modifiers);
 
-        canvas.context.translate(20, 20);
+        canvas.context.translate(15.5, 20);
 
         drawPoints(data.points, data.colors, modifiers);
     }
