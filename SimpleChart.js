@@ -26,6 +26,7 @@ function SimpleChart(data) {
 
             posX = 0;
             canvas.context.beginPath();
+            canvas.context.lineJoin = 'round';
             element.forEach(function (element, index, array) {
                 if (element === undefined) {
                     canvas.context.strokeStyle = lineColor;
@@ -74,7 +75,7 @@ function SimpleChart(data) {
         });
     }
 
-    function drawScene(canvas, modifiers)
+    function drawScene(modifiers)
     {
         var translate = {x: 0, y: 0};
 
@@ -108,6 +109,17 @@ function SimpleChart(data) {
             canvas.context.lineTo(canvas.object.width - 12, canvas.object.height - 18);
             canvas.context.lineTo(canvas.object.width - 5, canvas.object.height - 15);
             canvas.context.fill();
+
+            var part = canvas.width / (modifiers.maxLength - 1),
+                posX;
+            for (i = 1; i < modifiers.maxLength; i++) {
+                posX = (i * part) + 15.5;
+
+                canvas.context.beginPath();
+                canvas.context.moveTo(posX, canvas.object.height - 18);
+                canvas.context.lineTo(posX, canvas.object.height - 12);
+                canvas.context.stroke();
+            }
         }
         canvas.context.translate(-translate.x, -translate.y);
 
@@ -188,7 +200,7 @@ function SimpleChart(data) {
 
         modifiers = getModifiers(data.points);
 
-        drawScene(canvas, modifiers);
+        drawScene(modifiers);
 
         canvas.context.translate(15.5, 20);
 
