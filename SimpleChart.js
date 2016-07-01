@@ -1,13 +1,194 @@
-function SimpleChart(data) {
-    var canvas = {};
+var SimpleChart = function(data) {
+    /* Start Private Methods */
+    function getHelpers(points) {
+        var r = {
+            minValue: Infinity,
+            maxValue: -Infinity,
+            maxLength: 0
+        };
 
-    function drawPoints(points, colors, modifiers)
+        var v;
+
+        points.forEach(function (element) {
+            if (element.length > r.maxLength) {
+                r.maxLength = element.length;
+            }
+
+            v = searchMinMaxValues(element);
+
+            if (r.minValue > v.min) {
+                r.minValue = v.min;
+            }
+
+            if (r.maxValue < v.max) {
+                r.maxValue = v.max;
+            }
+        });
+
+        return r;
+    }
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function paintBorders(obj) {
+        var area = obj.canvas.area,
+            context = obj.canvas.context,
+            helpers = obj.helpers,
+            options = obj.options;
+
+        var translate = {x: -0.5, y: -0.5};
+
+        context.fillStyle = context.strokeStyle
+                          = '#000';
+        context.lineWidth = 1;
+
+        context.translate(translate.x, translate.y);
+        {
+            var addX,
+                posX = area.start.x,
+                posY = area.end.y;
+
+            if (helpers.minValue < 0) {
+                height = area.height;
+                width = area.width;
+
+                if (!options.showGrid) {
+                    height -= 10;
+                    width -= 10;
+                }
+
+                posY = -helpers.minValue / (helpers.maxValue - helpers.minValue) * height;
+                posY = Math.abs(area.height - posY);
+                posY += area.start.y;
+            }
+
+            addX = width / (helpers.maxLength - 1);
+
+            for (i = 0, j = helpers.maxLength; i < j; i++) {
+                if (options.showGrid) {
+                    context.strokeStyle = '#555';
+
+                    context.beginPath();
+                    context.moveTo(posX, posY - 2);
+                    context.lineTo(posX, posY + 2);
+                    context.stroke();
+
+                    context.strokeStyle = '#000';
+
+                    if (posY != area.end.y) {
+                        context.beginPath();
+                        context.moveTo(posX, area.end.y - 2);
+                        context.lineTo(posX, area.end.y + 2);
+                        context.stroke();
+                    }
+                } else {
+                    context.beginPath();
+                    context.moveTo(posX, posY - 2);
+                    context.lineTo(posX, posY + 2);
+                    context.stroke();
+                }
+
+                posX += addX;
+            }
+
+            context.beginPath();
+            context.moveTo(area.start.x, area.start.y);
+            context.lineTo(area.start.x, area.end.y);
+            context.stroke();
+
+            if (options.showGrid) {
+                context.beginPath();
+                context.moveTo(area.start.x, area.end.y);
+                context.lineTo(area.end.x, area.end.y);
+                context.stroke();
+
+                if (posY != area.end.y) {
+                    context.strokeStyle = '#555';
+
+                    context.beginPath();
+                    context.moveTo(area.start.x, posY);
+                    context.lineTo(area.end.x, posY);
+                    context.stroke();
+
+                    context.strokeStyle = '#000';
+                }
+
+                for (i = 0, posX = area.start.x; i < j; i++) {
+                    context.beginPath();
+                    context.moveTo(posX, area.start.y - 2);
+                    context.lineTo(posX, area.start.y + 2);
+                    context.stroke();
+
+                    posX += addX;
+                }
+
+                context.beginPath();
+                context.moveTo(area.start.x, area.start.y);
+                context.lineTo(area.end.x, area.start.y);
+                context.stroke();
+
+                context.beginPath();
+                context.moveTo(area.end.x, area.start.y);
+                context.lineTo(area.end.x, area.end.y);
+                context.stroke();
+            } else {
+                context.beginPath();
+                context.moveTo(area.start.x, posY);
+                context.lineTo(area.end.x, posY);
+                context.stroke();
+
+                context.beginPath();
+                context.moveTo(area.end.x - 7, posY - 3);
+                context.lineTo(area.end.x - 7, posY + 3);
+                context.lineTo(area.end.x, posY);
+                context.fill();
+
+                context.beginPath();
+                context.moveTo(area.start.x - 3, area.start.y + 7);
+                context.lineTo(area.start.x + 3, area.start.y + 7);
+                context.lineTo(area.start.x, area.start.y);
+                context.fill();
+            }
+        }
+        context.translate(-translate.x, -translate.y);
+    }
+
+    function paintPoints(obj)
     {
-        maxLength = modifiers.maxLength - 1;
+        var area = obj.canvas.area,
+            colors = obj.colors,
+            context = obj.canvas.context,
+            helpers = obj.helpers,
+            options = obj.options,
+            points = obj.points;
 
-        var posX, addX = canvas.width / maxLength;
-        points.forEach(function (element, index, array) {
-            canvas.context.lineWidth = 1;
+        var addX,
+            height,
+            pos = {
+                x: 0,
+                y: 0
+            },
+            width;
+
+        height = area.height;
+        width = area.width;
+        if (!options.showGrid) {
+            height -= 10;
+            width -= 10;
+        }
+
+        addX = width / (helpers.maxLength - 1);
+
+        points.forEach(function (element, index) {
+            context.lineWidth = 1;
+            context.lineJoin = 'round';
 
             lineColor = pointColor
                       = getRandomColor();
@@ -24,159 +205,69 @@ function SimpleChart(data) {
                 }
             }
 
-            posX = 0;
-            canvas.context.beginPath();
-            canvas.context.lineJoin = 'round';
-            element.forEach(function (element, index, array) {
+            pos.x = area.start.x;
+            var index = 0;
+            context.beginPath();
+            element.forEach(function (element) {
                 if (element === undefined) {
-                    canvas.context.strokeStyle = lineColor;
-                    canvas.context.stroke();
+                    context.strokeStyle = lineColor;
+                    context.stroke();
 
-                    canvas.context.beginPath();
+                    context.beginPath();
                     index = 0;
                 }
 
                 if ((element === null) || (element === undefined)) {
-                    posX += addX;
+                    pos.x += addX;
                     return;
                 }
 
-                posY = (element - modifiers.minValue) / (modifiers.maxValue - modifiers.minValue) * canvas.height;
-                posY = Math.abs(canvas.height - posY);
+                pos.y = (element - helpers.minValue) / (helpers.maxValue - helpers.minValue) * height;
+                pos.y = Math.abs(area.height - pos.y);
 
                 if (index == 0) {
-                    canvas.context.moveTo(posX, posY);
+                    context.moveTo(pos.x, pos.y + area.start.y);
                 } else {
-                    canvas.context.lineTo(posX, posY);
+                    context.lineTo(pos.x, pos.y + area.start.y);
                 }
 
-                posX += addX;
-            });
-            canvas.context.strokeStyle = lineColor;
-            canvas.context.stroke();
+                pos.x += addX;
 
-            posX = 0;
-            element.forEach(function (element, index, array) {
+                index++;
+            });
+            context.strokeStyle = lineColor;
+            context.stroke();
+
+            pos.x = area.start.x;
+            element.forEach(function (element) {
                 if ((element === null) || (element === undefined)) {
-                    posX += addX;
+                    pos.x += addX;
                     return;
                 }
 
-                posY = (element - modifiers.minValue) / (modifiers.maxValue - modifiers.minValue) * canvas.height;
-                posY = Math.abs(canvas.height - posY);
+                pos.y = (element - helpers.minValue) / (helpers.maxValue - helpers.minValue) * height;
+                pos.y = Math.abs(area.height - pos.y);
 
-                canvas.context.beginPath();
-                canvas.context.arc(posX, posY, 1.5, 0, 2 * Math.PI);
-                canvas.context.fillStyle = pointColor;
-                canvas.context.fill();
+                context.beginPath();
+                context.arc(pos.x, pos.y + area.start.y, 1.5, 0, 2 * Math.PI);
+                context.fillStyle = pointColor;
+                context.fill();
 
-                posX += addX;
+                pos.x += addX;
             });
         });
     }
 
-    function drawScene(modifiers)
+    function searchMinMaxValues(points)
     {
-        var translate = {x: 0, y: 0};
+        var min = Infinity,
+            max = -Infinity;
 
-        canvas.context.fillStyle = canvas.context.strokeStyle = '#000';
-        canvas.context.lineWidth = 1;
-
-        canvas.context.beginPath();
-        canvas.context.moveTo(15.5, 10);
-        canvas.context.lineTo(15.5, canvas.object.height - 10);
-        canvas.context.stroke();
-
-        if (modifiers.minValue < 0) {
-            translate.y = -modifiers.minValue / (modifiers.maxValue - modifiers.minValue) * canvas.height;
-            translate.y *= -1;
-
-            if ((Number(translate.y) === translate.y) && (translate.y % 1 === 0)) {
-                translate.y -= 0.5
-            }
-        }
-
-        canvas.context.translate(translate.x, translate.y);
-        {
-            canvas.context.beginPath();
-            canvas.context.moveTo(10, canvas.object.height - 15.5);
-            canvas.context.lineTo(canvas.object.width - 10, canvas.object.height - 15.5);
-            canvas.context.stroke();
-
-            canvas.context.translate(0, -0.5);
-            canvas.context.beginPath();
-            canvas.context.moveTo(canvas.object.width - 12, canvas.object.height - 12);
-            canvas.context.lineTo(canvas.object.width - 12, canvas.object.height - 18);
-            canvas.context.lineTo(canvas.object.width - 5, canvas.object.height - 15);
-            canvas.context.fill();
-
-            var part = canvas.width / (modifiers.maxLength - 1),
-                posX;
-            for (i = 1; i < modifiers.maxLength; i++) {
-                posX = (i * part) + 15.5;
-
-                canvas.context.beginPath();
-                canvas.context.moveTo(posX, canvas.object.height - 18);
-                canvas.context.lineTo(posX, canvas.object.height - 12);
-                canvas.context.stroke();
-            }
-        }
-        canvas.context.translate(-translate.x, -translate.y);
-
-        canvas.context.translate(0.5, 0.5);
-        {
-            canvas.context.beginPath();
-            canvas.context.moveTo(12, 12);
-            canvas.context.lineTo(18, 12);
-            canvas.context.lineTo(15, 5);
-            canvas.context.fill();
-        }
-        canvas.context.translate(-0.5, -0.5);
-    }
-
-    function getModifiers(points)
-    {
-        var maxLength = -Infinity,
-            maxValue = -Infinity,
-            minValue = Infinity;
-
-        points.forEach(function (element, index, array) {
-            if (element.length > maxLength) {
-                maxLength = element.length;
+        points.forEach(function (element) {
+            if ((element === undefined) || (element === null)) {
+                return;
             }
 
-            values = searchMinAndMaxValues(element);
-
-            if (values.max > maxValue) {
-                maxValue = values.max;
-            }
-
-            if (values.min < minValue) {
-                minValue = values.min;
-            }
-        });
-
-        return {
-            minValue: minValue,
-            maxValue: maxValue,
-            maxLength: maxLength
-        };
-    }
-
-    function getRandomColor() {
-        var letters = '0123456789ABCDEF'.split('');
-        var color = '#';
-        for (var i = 0; i < 6; i++ ) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    function searchMinAndMaxValues(array)
-    {
-        var max = -Infinity,
-            min = Infinity;
-        array.forEach(function (element, index, array) {
             if (element > max) {
                 max = element;
             }
@@ -192,18 +283,82 @@ function SimpleChart(data) {
         };
     }
 
-    window.onload = function() {
-        canvas.object = document.getElementById(data.id);
-        canvas.context = canvas.object.getContext('2d');
-        canvas.height = canvas.object.height - 35;
-        canvas.width = canvas.object.width - 35;
-
-        modifiers = getModifiers(data.points);
-
-        drawScene(modifiers);
-
-        canvas.context.translate(15.5, 20);
-
-        drawPoints(data.points, data.colors, modifiers);
+    function setAreaSize(obj) {
+        obj.canvas.area = {
+            start: {
+                x: 15,
+                y: 15
+            },
+            end: {
+                x: obj.canvas.object.width - 15,
+                y: obj.canvas.object.height - 15
+            },
+            height: obj.canvas.object.height - 30,
+            width: obj.canvas.object.width - 30
+        };
     }
+
+    function setOptions(obj, options) {
+        if (options === undefined) {
+            return;
+        }
+
+        if (options.fullSize === true) {
+            obj.options.fullSize = true;
+        }
+
+        if (options.showGrid === true) {
+            obj.options.showGrid = true;
+        }
+    }
+    /* End Private Methods */
+
+    /* Start Public Methods */
+    this.paint = function () {
+        paintBorders(this);
+
+        paintPoints(this);
+    };
+
+    this.setFullSize = function() {
+        var objectParent = this.canvas.object.parentElement;
+
+        if (this.options.fullSize) {
+            this.canvas.object.width = objectParent.offsetWidth;
+
+            if ((objectParent.style.height === undefined) || (objectParent.style.height === null) || (objectParent.style.height === '')) {
+                this.canvas.object.height = this.canvas.object.width * 0.61803;
+            } else {
+                this.canvas.object.height = parseFloat(objectParent.style.height);
+            }
+        }
+    };
+    /* End Public Methods */
+
+    /* Start Constructor */
+    this.canvas = {};
+    this.options = {
+        fullSize: false,
+        showGrid: false,
+        startOnZero: false
+    };
+    this.colors = data.colors;
+    this.points = data.points;
+    this.helpers = getHelpers(this.points);
+
+    setOptions(this, data.options);
+
+    var obj = this;
+    window.onresize = window.onload = function() {
+        obj.canvas.object = document.getElementById(data.id);
+
+        obj.canvas.context = obj.canvas.object.getContext('2d');
+
+        obj.setFullSize();
+
+        setAreaSize(obj);
+
+        obj.paint();
+    };
+    /* End Constructor */
 };
