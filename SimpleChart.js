@@ -55,8 +55,8 @@ var SimpleChart = function(data) {
                 posX = area.start.x,
                 posY = area.end.y;
 
-            height = area.height;
-            width = area.width;
+            var height = area.height,
+                width = area.width;
 
             if (!options.showGrid) {
                 height -= 10;
@@ -142,6 +142,8 @@ var SimpleChart = function(data) {
                 context.moveTo(area.end.x, area.start.y);
                 context.lineTo(area.end.x, area.end.y);
                 context.stroke();
+
+                paintGrid(obj);
             } else {
                 context.beginPath();
                 context.moveTo(area.start.x, posY);
@@ -164,8 +166,36 @@ var SimpleChart = function(data) {
         context.translate(-translate.x, -translate.y);
     }
 
-    function paintPoints(obj)
-    {
+    function paintGrid(obj) {
+        var area = obj.canvas.area,
+            context = obj.canvas.context,
+            helpers = obj.helpers,
+            options = obj.options;
+
+        var width = area.width;
+
+        if (!options.showGrid) {
+            width -= 10;
+        }
+
+        var addX,
+            maxLength = helpers.maxLength - 1;
+
+        addX = width / maxLength;
+
+        context.strokeStyle = '#555';
+
+        for (i = 1, j = maxLength; i < j; i++) {
+            context.beginPath();
+            context.moveTo(addX * i + area.start.x, area.start.y);
+            context.lineTo(addX * i + area.start.x, area.end.y);
+            context.stroke();
+        }
+
+        context.strokeStyle = '#000';
+    }
+
+    function paintPoints(obj) {
         var area = obj.canvas.area,
             colors = obj.colors,
             context = obj.canvas.context,
@@ -262,8 +292,7 @@ var SimpleChart = function(data) {
         });
     }
 
-    function searchMinMaxValues(points)
-    {
+    function searchMinMaxValues(points) {
         var min = Infinity,
             max = -Infinity;
 
