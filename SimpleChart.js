@@ -108,6 +108,8 @@ var SimpleChart = function(data) {
             context.stroke();
 
             if (options.showGrid) {
+                paintGrid(obj);
+
                 context.beginPath();
                 context.moveTo(area.start.x, area.end.y);
                 context.lineTo(area.end.x, area.end.y);
@@ -142,8 +144,6 @@ var SimpleChart = function(data) {
                 context.moveTo(area.end.x, area.start.y);
                 context.lineTo(area.end.x, area.end.y);
                 context.stroke();
-
-                paintGrid(obj);
             } else {
                 context.beginPath();
                 context.moveTo(area.start.x, posY);
@@ -183,7 +183,7 @@ var SimpleChart = function(data) {
 
         addX = width / maxLength;
 
-        context.strokeStyle = '#555';
+        context.strokeStyle = '#CCC';
 
         for (i = 1, j = maxLength; i < j; i++) {
             context.beginPath();
