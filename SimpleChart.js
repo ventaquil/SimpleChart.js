@@ -195,6 +195,38 @@ var SimpleChart = function(data) {
         context.strokeStyle = '#000';
     }
 
+    function paintLabels(obj) {
+        var colors = obj.colors,
+            labels = obj.labels;
+
+        var container = document.getElementById(obj.id + '-labels');
+
+        if (container === null) {
+            return;
+        }
+
+        var label,
+            colorBox;
+        labels.forEach(function (element, index) {
+            colorBox = document.createElement('div');
+            colorBox.style.border = '2px solid ' + colors[index].line;
+            colorBox.style.backgroundColor = colors[index].point;
+            colorBox.style.width = '30px';
+            colorBox.style.display = 'inline-block';
+            colorBox.style.marginRight = '5px';
+            colorBox.style.height = '5px';
+
+            label = document.createElement('div');
+            label.className = 'label';
+            label.style.fontSize = '12px';
+            label.style.fontFamily = 'Arial';
+            label.appendChild(colorBox);
+            label.appendChild(document.createTextNode(element));
+
+            container.appendChild(label);
+        });
+    }
+
     function paintPoints(obj) {
         var area = obj.canvas.area,
             colors = obj.colors,
@@ -385,6 +417,8 @@ var SimpleChart = function(data) {
         paintBorders(this);
 
         paintPoints(this);
+
+        paintLabels(this);
     };
 
     this.setFullSize = function() {
@@ -403,6 +437,7 @@ var SimpleChart = function(data) {
     /* End Public Methods */
 
     /* Start Constructor */
+    this.id = data.id;
     this.canvas = {};
     this.options = {
         fullSize: false,
