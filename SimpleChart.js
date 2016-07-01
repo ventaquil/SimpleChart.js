@@ -69,6 +69,10 @@ var SimpleChart = function(data) {
                 posY += area.start.y;
             }
 
+            if ((Number(posY) === posY) && (posY % 1 !== 0) && !options.showGrid) {
+                posY += 0.5;
+            }
+
             addX = width / (helpers.maxLength - 1);
 
             for (i = 0, j = helpers.maxLength; i < j; i++) {
