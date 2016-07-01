@@ -77,14 +77,10 @@ var SimpleChart = function(data) {
 
             for (i = 0, j = helpers.maxLength; i < j; i++) {
                 if (options.showGrid) {
-                    context.strokeStyle = '#555';
-
                     context.beginPath();
                     context.moveTo(posX, posY - 2);
                     context.lineTo(posX, posY + 2);
                     context.stroke();
-
-                    context.strokeStyle = '#000';
 
                     if (posY != area.end.y) {
                         context.beginPath();
@@ -116,14 +112,10 @@ var SimpleChart = function(data) {
                 context.stroke();
 
                 if (posY != area.end.y) {
-                    context.strokeStyle = '#555';
-
                     context.beginPath();
                     context.moveTo(area.start.x, posY);
                     context.lineTo(area.end.x, posY);
                     context.stroke();
-
-                    context.strokeStyle = '#000';
                 }
 
                 for (i = 0, posX = area.start.x; i < j; i++) {
