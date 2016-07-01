@@ -55,15 +55,15 @@ var SimpleChart = function(data) {
                 posX = area.start.x,
                 posY = area.end.y;
 
+            height = area.height;
+            width = area.width;
+
+            if (!options.showGrid) {
+                height -= 10;
+                width -= 10;
+            }
+
             if (helpers.minValue < 0) {
-                height = area.height;
-                width = area.width;
-
-                if (!options.showGrid) {
-                    height -= 10;
-                    width -= 10;
-                }
-
                 posY = -helpers.minValue / (helpers.maxValue - helpers.minValue) * height;
                 posY = Math.abs(area.height - posY);
                 posY += area.start.y;
@@ -349,7 +349,7 @@ var SimpleChart = function(data) {
     setOptions(this, data.options);
 
     var obj = this;
-    window.onresize = window.onload = function() {
+    var e = function() {
         obj.canvas.object = document.getElementById(data.id);
 
         obj.canvas.context = obj.canvas.object.getContext('2d');
@@ -360,5 +360,8 @@ var SimpleChart = function(data) {
 
         obj.paint();
     };
+
+    window.addEventListener('DOMContentLoaded', e);
+    window.addEventListener('resize', e);
     /* End Constructor */
 };
