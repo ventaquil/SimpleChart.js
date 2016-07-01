@@ -210,6 +210,7 @@ var SimpleChart = function(data) {
         labels.forEach(function (element, index) {
             colorBox = document.createElement('div');
             colorBox.style.border = '2px solid ' + colors[index].line;
+            colorBox.style.borderRadius = '3px';
             colorBox.style.backgroundColor = colors[index].point;
             colorBox.style.width = '30px';
             colorBox.style.display = 'inline-block';
