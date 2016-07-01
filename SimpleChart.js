@@ -197,6 +197,8 @@ var SimpleChart = function(data) {
             return;
         }
 
+        container.innerHTML = '';
+
         var label,
             colorBox;
         labels.forEach(function (element, index) {
