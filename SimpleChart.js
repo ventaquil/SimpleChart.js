@@ -227,17 +227,27 @@ var SimpleChart = function(data) {
             lineColor = pointColor
                       = getRandomColor();
 
-            if (colors !== undefined) {
-                if (colors[index] !== undefined) {
-                    if (colors[index].point !== undefined) {
-                        pointColor = colors[index].point;
-                    }
+            if (colors === undefined) {
+                colors = new Array();
+            }
 
-                    if (colors[index].line !== undefined) {
-                        lineColor = colors[index].line;
-                    }
+            if (colors[index] === undefined) {
+                colors[index] = {
+                    line: null,
+                    point: null
+                };
+            } else {
+                if (colors[index].line !== undefined) {
+                    lineColor = colors[index].line;
+                }
+
+                if (colors[index].point !== undefined) {
+                    pointColor = colors[index].point;
                 }
             }
+
+            colors[index].line = lineColor;
+            colors[index].point = pointColor;
 
             pos.x = area.start.x;
             var index = 0;
@@ -290,6 +300,8 @@ var SimpleChart = function(data) {
                 pos.x += addX;
             });
         });
+
+        obj.colors = colors;
     }
 
     function searchMinMaxValues(points) {
@@ -331,6 +343,20 @@ var SimpleChart = function(data) {
         };
     }
 
+    function setLabels(obj, labels) {
+        if (labels === undefined) {
+            labels = [];
+        }
+
+        obj.labels = labels;
+
+        obj.points.forEach(function (element, index) {
+            if (obj.labels[index] === undefined) {
+                obj.labels[index] = 'No Data';
+            }
+        });
+    }
+
     function setOptions(obj, options) {
         if (options === undefined) {
             return;
@@ -347,7 +373,15 @@ var SimpleChart = function(data) {
     /* End Private Methods */
 
     /* Start Public Methods */
-    this.paint = function () {
+    this.draw = function() {
+        this.setFullSize();
+
+        setAreaSize(this);
+
+        this.paint();
+    };
+
+    this.paint = function() {
         paintBorders(this);
 
         paintPoints(this);
@@ -379,22 +413,22 @@ var SimpleChart = function(data) {
     this.points = data.points;
     this.helpers = getHelpers(this.points);
 
+    setLabels(this, data.labels);
+
     setOptions(this, data.options);
 
     var obj = this;
-    var e = function() {
+
+    window.addEventListener('DOMContentLoaded', function() {
         obj.canvas.object = document.getElementById(data.id);
 
         obj.canvas.context = obj.canvas.object.getContext('2d');
 
-        obj.setFullSize();
+        obj.draw();
+    });
 
-        setAreaSize(obj);
-
-        obj.paint();
-    };
-
-    window.addEventListener('DOMContentLoaded', e);
-    window.addEventListener('resize', e);
+    window.addEventListener('resize', function() {
+        obj.draw();
+    });
     /* End Constructor */
 };
