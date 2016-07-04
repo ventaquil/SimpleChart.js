@@ -234,7 +234,7 @@ var SimpleChart = function(data) {
             styles = document.createElement('style');
             styles.id = 'SimpleChart-styles';
             styles.type = 'text/css';
-            styles.innerHTML = '.simplechart-label{font-family:Arial;font-size:12px;} .simplechart-label div {border-radius:3px;border-style:solid;border-width:2px;display:inline-block;height:5px;margin-right:5px;width:30px;} .simplechart-label div.unvisible {opacity:.5;} div.visible {visible:1;}';
+            styles.innerHTML = '.simplechart-label{font-family:Arial;font-size:12px;} .simplechart-label div {border-radius:3px;border-style:solid;border-width:2px;display:inline-block;height:5px;margin-right:5px;width:30px;} .simplechart-label div.unvisible {opacity:.5;} div.visible {opacity:1;}';
             document.getElementsByTagName('head')[0].appendChild(styles);
         }
 
