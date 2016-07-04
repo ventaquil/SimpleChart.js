@@ -31,6 +31,10 @@ var SimpleChart = function(data) {
             }
         });
 
+        if ((r.minValue > 0) && obj.options.startOnZero) {
+            r.minValue = 0;
+        }
+
         return r;
     }
 
@@ -420,6 +424,10 @@ var SimpleChart = function(data) {
 
         if (options.showGrid === true) {
             obj.options.showGrid = true;
+        }
+
+        if (options.startOnZero === true) {
+            obj.options.startOnZero = true;
         }
     }
 
