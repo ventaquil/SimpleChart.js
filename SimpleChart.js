@@ -514,6 +514,18 @@ var SimpleChart = function(data) {
         this.paint();
     };
 
+    this.isGridEnabled = function() {
+        return this.options.showGrid;
+    };
+
+    this.isVisible = this.setVisible = function(index) {
+        if (this.visible[index] !== undefined) {
+            return this.visible[index];
+        }
+
+        return undefined;
+    };
+
     this.paint = function() {
         paintBorders(this);
 
@@ -573,6 +585,22 @@ var SimpleChart = function(data) {
 
             this.draw();
         }
+    };
+
+    this.turnOffGrid = function() {
+        this.options.showGrid = false;
+
+        this.helpers = getHelpers(this.points, this);
+
+        this.draw();
+    };
+
+    this.turnOnGrid = function() {
+        this.options.showGrid = true;
+
+        this.helpers = getHelpers(this.points, this);
+
+        this.draw();
     };
     /* End Public Methods */
 
