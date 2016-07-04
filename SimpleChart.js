@@ -199,24 +199,31 @@ var SimpleChart = function(data) {
 
         container.innerHTML = '';
 
+        var styles;
+        styles = document.getElementById('SimpleChart-styles');
+        if ((styles === null) || (styles === undefined)) {
+            styles = document.createElement('style');
+            styles.id = 'SimpleChart-styles';
+            styles.type = 'text/css';
+            styles.innerHTML = '.simplechart-label{font-family:Arial;font-size:12px;} .simplechart-label div {border-radius:3px;border-style:solid;border-width:2px;display:inline-block;height:5px;margin-right:5px;width:30px;}';
+            document.getElementsByTagName('head')[0].appendChild(styles);
+        }
+
         var label,
-            colorBox;
+            colorBox,
+            textBox;
         labels.forEach(function (element, index) {
             colorBox = document.createElement('div');
-            colorBox.style.border = '2px solid ' + colors[index].line;
-            colorBox.style.borderRadius = '3px';
+            colorBox.style.borderColor = colors[index].line;
             colorBox.style.backgroundColor = colors[index].point;
-            colorBox.style.width = '30px';
-            colorBox.style.display = 'inline-block';
-            colorBox.style.marginRight = '5px';
-            colorBox.style.height = '5px';
+
+            textBox = document.createElement('span');
+            textBox.appendChild(document.createTextNode(element));
 
             label = document.createElement('div');
-            label.className = 'label';
-            label.style.fontSize = '12px';
-            label.style.fontFamily = 'Arial';
+            label.className = 'simplechart-label';
             label.appendChild(colorBox);
-            label.appendChild(document.createTextNode(element));
+            label.appendChild(textBox);
 
             container.appendChild(label);
         });
