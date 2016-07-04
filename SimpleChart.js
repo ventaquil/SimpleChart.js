@@ -498,7 +498,8 @@ var SimpleChart = function(data) {
         var objectParent = this.canvas.object.parentElement;
 
         if (this.options.fullSize) {
-            this.canvas.object.width = objectParent.offsetWidth;
+            var computedStyle = window.getComputedStyle(objectParent, null);
+            this.canvas.object.width = objectParent.offsetWidth - (parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.borderLeftWidth)) - (parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.borderRightWidth));
 
             if ((objectParent.style.height === undefined) || (objectParent.style.height === null) || (objectParent.style.height === '')) {
                 this.canvas.object.height = this.canvas.object.width * 0.61803;
@@ -561,7 +562,7 @@ var SimpleChart = function(data) {
 
     var obj = this;
 
-    window.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('load', function() {
         obj.canvas.object = document.getElementById(data.id);
 
         obj.canvas.context = obj.canvas.object.getContext('2d');
