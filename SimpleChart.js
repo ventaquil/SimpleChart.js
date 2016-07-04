@@ -55,6 +55,7 @@ var SimpleChart = function(data) {
         var area = obj.canvas.area,
             context = obj.canvas.context,
             helpers = obj.helpers,
+            lineText = obj.lineText,
             options = obj.options;
 
         var translate = {x: -0.5, y: -0.5};
@@ -62,6 +63,7 @@ var SimpleChart = function(data) {
         context.fillStyle = context.strokeStyle
                           = '#000';
         context.lineWidth = 1;
+        context.font = '8px Arial';
 
         context.translate(translate.x, translate.y);
         {
@@ -105,12 +107,20 @@ var SimpleChart = function(data) {
                         context.moveTo(posX, area.end.y - 2);
                         context.lineTo(posX, area.end.y + 2);
                         context.stroke();
+
+                        if (lineText[i] !== undefined) {
+                            context.fillText(lineText[i], posX - Math.round(context.measureText(lineText[i]).width / 2), posY + 13);
+                        }
                     }
                 } else {
                     context.beginPath();
                     context.moveTo(posX, posY - 2);
                     context.lineTo(posX, posY + 2);
                     context.stroke();
+
+                    if (lineText[i] !== undefined) {
+                        context.fillText(lineText[i], posX - Math.round(context.measureText(lineText[i]).width / 2), posY + 13);
+                    }
                 }
 
                 posX += addX;
@@ -414,16 +424,28 @@ var SimpleChart = function(data) {
 
     function setLabels(obj, labels) {
         if (labels === undefined) {
-            labels = [];
+            labels = new Array();
         }
 
         obj.labels = labels;
 
         obj.points.forEach(function (element, index) {
             if (obj.labels[index] === undefined) {
-                obj.labels[index] = 'No Data';
+                obj.labels[index] = 'Unnamed Label';
             }
         });
+    }
+
+    function setLineText(obj, lineText) {
+        if (lineText === undefined) {
+            lineText = new Array();
+        }
+
+        for (var i = obj.helpers.maxLength, j = lineText.length; i < j; i++) {
+            delete lineText[i];
+        }
+
+        obj.lineText = lineText;
     }
 
     function setOptions(obj, options) {
@@ -534,6 +556,8 @@ var SimpleChart = function(data) {
     this.helpers = getHelpers(this.points, this);
 
     setLabels(this, data.labels);
+
+    setLineText(this, data.lineText);
 
     var obj = this;
 
