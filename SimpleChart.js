@@ -107,10 +107,10 @@ var SimpleChart = function(data) {
                         context.moveTo(posX, area.end.y - 2);
                         context.lineTo(posX, area.end.y + 2);
                         context.stroke();
+                    }
 
-                        if (lineText[i] !== undefined) {
-                            context.fillText(lineText[i], posX - Math.round(context.measureText(lineText[i]).width / 2), posY + 13);
-                        }
+                    if (lineText[i] !== undefined) {
+                        context.fillText(lineText[i], posX - Math.round(context.measureText(lineText[i]).width / 2), posY + 13);
                     }
                 } else {
                     context.beginPath();
