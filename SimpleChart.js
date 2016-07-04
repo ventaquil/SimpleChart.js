@@ -31,8 +31,12 @@ var SimpleChart = function(data) {
             }
         });
 
-        if ((r.minValue > 0) && obj.options.startOnZero) {
-            r.minValue = 0;
+        if ((obj !== undefined) && obj.options.startOnZero) {
+            if (r.minValue > 0) {
+                r.minValue = 0;
+            } else if (r.maxValue < 0) {
+                r.maxValue = 0;
+            }
         }
 
         return r;
@@ -74,7 +78,11 @@ var SimpleChart = function(data) {
             }
 
             if (helpers.minValue < 0) {
-                posY = -helpers.minValue / (helpers.maxValue - helpers.minValue) * height;
+                if (helpers.maxValue < 0) {
+                    posY = height;
+                } else {
+                    posY = -helpers.minValue / (helpers.maxValue - helpers.minValue) * height;
+                }
                 posY = Math.abs(area.height - posY);
                 posY += area.start.y;
             }
@@ -520,11 +528,12 @@ var SimpleChart = function(data) {
     this.colors = data.colors;
     this.visible = setVisiblePoints(data.points);
     this.points = data.points;
-    this.helpers = getHelpers(this.points);
-
-    setLabels(this, data.labels);
 
     setOptions(this, data.options);
+
+    this.helpers = getHelpers(this.points, this);
+
+    setLabels(this, data.labels);
 
     var obj = this;
 
