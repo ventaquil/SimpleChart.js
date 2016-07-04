@@ -110,7 +110,21 @@ var SimpleChart = function(data) {
                     }
 
                     if (lineText[i] !== undefined) {
-                        context.fillText(lineText[i], posX - Math.round(context.measureText(lineText[i]).width / 2), posY + 13);
+                        var textWidth = context.measureText(lineText[i]).width,
+                            roundedHalfTextWidth =  Math.round(textWidth / 2);
+
+                        if (lineText[i] !== undefined) {
+                            var textWidth = context.measureText(lineText[i]).width,
+                                roundedHalfTextWidth =  Math.round(textWidth / 2);
+
+                            if (((posX - roundedHalfTextWidth) >= 0) && ((posX + roundedHalfTextWidth) <= obj.canvas.object.width)) {
+                                context.fillText(lineText[i], posX - roundedHalfTextWidth, posY + 13);
+                            } else if ((posX - roundedHalfTextWidth) < 0) {
+                                context.fillText(lineText[i], 2, posY + 13);
+                            } else if ((posX + roundedHalfTextWidth) > obj.canvas.object.width) {
+                                context.fillText(lineText[i], obj.canvas.object.width - (textWidth + 2), posY + 13);
+                            }
+                        }
                     }
                 } else {
                     context.beginPath();
@@ -119,7 +133,16 @@ var SimpleChart = function(data) {
                     context.stroke();
 
                     if (lineText[i] !== undefined) {
-                        context.fillText(lineText[i], posX - Math.round(context.measureText(lineText[i]).width / 2), posY + 13);
+                        var textWidth = context.measureText(lineText[i]).width,
+                            roundedHalfTextWidth =  Math.round(textWidth / 2);
+
+                        if (((posX - roundedHalfTextWidth) >= 0) && ((posX + roundedHalfTextWidth) <= obj.canvas.object.width)) {
+                            context.fillText(lineText[i], posX - roundedHalfTextWidth, posY + 13);
+                        } else if ((posX - roundedHalfTextWidth) < 0) {
+                            context.fillText(lineText[i], 2, posY + 13);
+                        } else if ((posX + roundedHalfTextWidth) > obj.canvas.object.width) {
+                            context.fillText(lineText[i], obj.canvas.object.width - (textWidth + 2), posY + 13);
+                        }
                     }
                 }
 
