@@ -205,7 +205,7 @@ var SimpleChart = function(data) {
 
         context.strokeStyle = '#CCC';
 
-        for (i = 1, j = maxLength; i < j; i++) {
+        for (var i = 1, j = maxLength; i < j; i++) {
             context.beginPath();
             context.moveTo(addX * i + area.start.x, area.start.y);
             context.lineTo(addX * i + area.start.x, area.end.y);
