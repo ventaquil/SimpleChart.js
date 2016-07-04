@@ -557,6 +557,14 @@ var SimpleChart = function(data) {
         }
     };
 
+    this.toggleGrid = function() {
+        this.options.showGrid = !this.options.showGrid;
+
+        this.helpers = getHelpers(this.points, this);
+
+        this.draw();
+    };
+
     this.toggleVisible = function(index) {
         if (this.visible[index] !== undefined) {
             this.visible[index] = !this.visible[index];
