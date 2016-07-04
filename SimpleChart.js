@@ -1,6 +1,8 @@
 var SimpleChart = function(data) {
+    "use strict";
+
     /* Start Private Methods */
-    function getHelpers(points) {
+    function getHelpers(points, obj) {
         var r = {
             minValue: Infinity,
             maxValue: -Infinity,
@@ -9,7 +11,11 @@ var SimpleChart = function(data) {
 
         var v;
 
-        points.forEach(function (element) {
+        points.forEach(function (element, index) {
+            if ((obj !== undefined) && !obj.visible[index]) {
+                return;
+            }
+
             if (element.length > r.maxLength) {
                 r.maxLength = element.length;
             }
@@ -75,7 +81,7 @@ var SimpleChart = function(data) {
 
             addX = width / (helpers.maxLength - 1);
 
-            for (i = 0, j = helpers.maxLength; i < j; i++) {
+            for (var i = 0, j = helpers.maxLength; i < j; i++) {
                 if (options.showGrid) {
                     context.beginPath();
                     context.moveTo(posX, posY - 2);
@@ -222,6 +228,10 @@ var SimpleChart = function(data) {
 
             label = document.createElement('div');
             label.className = 'simplechart-label';
+            label.addEventListener('click', function () {
+                obj.toggleVisible(index);
+                obj.draw();
+            });
             label.appendChild(colorBox);
             label.appendChild(textBox);
 
@@ -235,7 +245,8 @@ var SimpleChart = function(data) {
             context = obj.canvas.context,
             helpers = obj.helpers,
             options = obj.options,
-            points = obj.points;
+            points = obj.points,
+            visible = obj.visible;
 
         var addX,
             height,
@@ -254,7 +265,14 @@ var SimpleChart = function(data) {
 
         addX = width / (helpers.maxLength - 1);
 
+        var lineColor,
+            pointColor;
+
         points.forEach(function (element, index) {
+            if (!visible[index]) {
+                return;
+            }
+
             context.lineWidth = 1;
             context.lineJoin = 'round';
 
@@ -404,6 +422,16 @@ var SimpleChart = function(data) {
             obj.options.showGrid = true;
         }
     }
+
+    function setVisiblePoints(points) {
+        var visible = new Array();
+
+        points.forEach(function (element, index) {
+            visible[index] = true;
+        });
+
+        return visible;
+    }
     /* End Private Methods */
 
     /* Start Public Methods */
@@ -436,6 +464,30 @@ var SimpleChart = function(data) {
             }
         }
     };
+
+    this.setUnvisible = function(index) {
+        if (this.visible[index] !== undefined) {
+            this.visible[index] = false;
+
+            this.helpers = getHelpers(this.points, this);
+        }
+    };
+
+    this.setVisible = function(index) {
+        if (this.visible[index] !== undefined) {
+            this.visible[index] = true;
+
+            this.helpers = getHelpers(this.points, this);
+        }
+    };
+
+    this.toggleVisible = function(index) {
+        if (this.visible[index] !== undefined) {
+            this.visible[index] = !this.visible[index];
+
+            this.helpers = getHelpers(this.points, this);
+        }
+    };
     /* End Public Methods */
 
     /* Start Constructor */
@@ -447,6 +499,7 @@ var SimpleChart = function(data) {
         startOnZero: false
     };
     this.colors = data.colors;
+    this.visible = setVisiblePoints(data.points);
     this.points = data.points;
     this.helpers = getHelpers(this.points);
 
