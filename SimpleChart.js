@@ -199,7 +199,8 @@ var SimpleChart = function(data) {
 
     function paintLabels(obj) {
         var colors = obj.colors,
-            labels = obj.labels;
+            labels = obj.labels,
+            visible = obj.visible;
 
         var container = document.getElementById(obj.id + '-labels');
 
@@ -215,7 +216,7 @@ var SimpleChart = function(data) {
             styles = document.createElement('style');
             styles.id = 'SimpleChart-styles';
             styles.type = 'text/css';
-            styles.innerHTML = '.simplechart-label{font-family:Arial;font-size:12px;} .simplechart-label div {border-radius:3px;border-style:solid;border-width:2px;display:inline-block;height:5px;margin-right:5px;width:30px;}';
+            styles.innerHTML = '.simplechart-label{font-family:Arial;font-size:12px;} .simplechart-label div {border-radius:3px;border-style:solid;border-width:2px;display:inline-block;height:5px;margin-right:5px;width:30px;} .simplechart-label div.unvisible {opacity:.5;} div.visible {visible:1;}';
             document.getElementsByTagName('head')[0].appendChild(styles);
         }
 
@@ -224,6 +225,11 @@ var SimpleChart = function(data) {
             textBox;
         labels.forEach(function (element, index) {
             colorBox = document.createElement('div');
+            if (visible[index]) {
+                colorBox.className = 'visible';
+            } else {
+                colorBox.className = 'unvisible';
+            }
             colorBox.style.borderColor = colors[index].line;
             colorBox.style.backgroundColor = colors[index].point;
 
@@ -234,7 +240,6 @@ var SimpleChart = function(data) {
             label.className = 'simplechart-label';
             label.addEventListener('click', function () {
                 obj.toggleVisible(index);
-                obj.draw();
             });
             label.appendChild(colorBox);
             label.appendChild(textBox);
@@ -478,6 +483,8 @@ var SimpleChart = function(data) {
             this.visible[index] = false;
 
             this.helpers = getHelpers(this.points, this);
+
+            this.draw();
         }
     };
 
@@ -486,6 +493,8 @@ var SimpleChart = function(data) {
             this.visible[index] = true;
 
             this.helpers = getHelpers(this.points, this);
+
+            this.draw();
         }
     };
 
@@ -494,6 +503,8 @@ var SimpleChart = function(data) {
             this.visible[index] = !this.visible[index];
 
             this.helpers = getHelpers(this.points, this);
+
+            this.draw();
         }
     };
     /* End Public Methods */
