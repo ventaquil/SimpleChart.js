@@ -58,6 +58,11 @@ var SimpleChart = function(data) {
             lineText = obj.lineText,
             options = obj.options;
 
+        context.beginPath();
+        context.rect(area.start.x, area.start.y, area.width, area.height);
+        context.fillStyle = '#fff';
+        context.fill();
+
         var translate = {x: -0.5, y: -0.5};
 
         context.fillStyle = context.strokeStyle
